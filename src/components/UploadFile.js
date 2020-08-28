@@ -2,46 +2,58 @@ import React, { useState, useEffect, useContext } from "react";
 import { ResultContext } from "../contexts.js/ResultContext";
 
 const UploadFile = () => {
-  const [content, setContent] = useState("");
+  const [fileName, setFilename] = useState("No file chosen");
   const [sorted, setSorted] = useState([]);
-  const { results, updateResult } = useContext(ResultContext);
-
-  useEffect(() => {
-    let users = {};
-    content &&
-      content.forEach((line) => {
-        const [username, words] = line.substr(1).split("> ");
-        const count = words.match(/\s/g).length;
-        users[username] = (users[username] || 0) + count;
-      });
-    console.log(users);
-    var sortable = [];
-    for (var user in users) {
-      sortable.push({
-        id: Math.floor(Math.random() * 100000),
-        user,
-        count: users[user],
-      });
-    }
-    sortable.sort((b, a) => {
-      return a.count - b.count;
-    });
-    setSorted(sortable);
-    return () => {};
-  }, [content]);
+  const { updateResult } = useContext(ResultContext);
+  let wordCount = [];
+  let username = [];
 
   const readFile = async (e) => {
     e.preventDefault();
+    setSorted([]);
     var fileType = /text.*/;
     if (e.target.files[0] && e.target.files[0].type.match(fileType)) {
       const reader = new FileReader();
       reader.onload = async (e) => {
-        setContent(
-          e.target.result.split("\n").filter((line) => line[0] === "<")
-        );
+        e.target.result
+          .split(/<[^\s>]*>/g)
+          .slice(1)
+          .forEach((line) => {
+            wordCount.push(line.match(/\b(\w\w*)\b/g).length);
+          });
+        // console.log(e.target.result.split(/<[^\s>]*>/g));
+        username = e.target.result
+          .split(/[\s|\n]/g)
+          .filter((word) => word.match(/<[^\s>]*>/g));
+        console.log("username", username, "wordCount", wordCount);
+        let users = {};
+        let i = 0;
+        username.forEach((user) => {
+          users[user] = (users[user] || 0) + wordCount[i];
+          i++;
+        });
+        var sortable = [];
+        for (var user in users) {
+          sortable.push({
+            id: Math.floor(Math.random() * 100000),
+            user,
+            count: users[user],
+          });
+        }
+        sortable.sort((b, a) => {
+          return a.count - b.count;
+        });
+        console.log(sortable, "from latest one");
+        setSorted(sortable);
+        // setContent(
+        //   e.target.result.split("\n").filter((line) => line[0] === "<")
+        // );
       };
       reader.readAsText(e.target.files[0]);
+      setFilename(e.target.files[0].name);
+      e.target.value = "";
     } else {
+      setFilename("Invalid file type !");
       alert("Invalid file type !");
     }
   };
@@ -49,10 +61,16 @@ const UploadFile = () => {
   return (
     <div>
       <h5>Upload a log file (.txt)</h5>
-      <input type="file" onChange={(e) => readFile(e)} />
+      <input type="file" onChange={(e) => readFile(e)} id="myFileInput" />
+      <label id="myFileLabel" htmlFor="myFileInput">
+        Choose file
+      </label>
+      <span id="myFileName">{fileName}</span>
       <button
+        disabled={sorted.length < 1}
         onClick={() => {
           updateResult(sorted);
+          setSorted([]);
         }}
       >
         Upload
