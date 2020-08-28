@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useContext } from "react";
 import { ResultContext } from "../contexts.js/ResultContext";
 
 const UploadFile = () => {
@@ -24,13 +24,18 @@ const UploadFile = () => {
         // console.log(e.target.result.split(/<[^\s>]*>/g));
         username = e.target.result
           .split(/[\s|\n]/g)
-          .filter((word) => word.match(/<[^\s>]*>/g));
+          .filter((word) => word.match(/<[^\s>]*>/g))
+          .map((name) => {
+            console.log(name.substr(1, name.length - 2));
+            return name.substr(1, name.length - 2);
+          });
+
         console.log("username", username, "wordCount", wordCount);
         let users = {};
-        let i = 0;
-        username.forEach((user) => {
-          users[user] = (users[user] || 0) + wordCount[i];
-          i++;
+
+        username.forEach((user, index) => {
+          // console.log(user.substr(1, user.length - 1));
+          users[user] = (users[user] || 0) + wordCount[index];
         });
         var sortable = [];
         for (var user in users) {
