@@ -15,13 +15,13 @@ const UploadFile = () => {
       .split(/<[^\s>]*>/g)
       .slice(1)
       .map((line) => {
-        return line.match(/\b(\w\w*)\b/g).length;
+        return line.trim() !== "" && line.match(/\b(\w\w*)\b/g).length;
       });
     let username = content
       .split(/[\s|\n]/g)
       .filter((word) => word.match(/<[^\s>]*>/g))
       .map((name) => {
-        return name.substr(1, name.length - 2);
+        return name.substr(name.indexOf("<") + 1, name.indexOf(">") - 1);
       });
     // console.log("username", username, "wordCount", wordCount);
     username.forEach((user, index) => {
@@ -66,7 +66,6 @@ const UploadFile = () => {
         type="file"
         accept=".txt"
         onChange={(e) => handleFileChosen(e.target.files[0], e)}
-        // onChange={(e) => readFile(e)}
         id="myFileInput"
       />
       <label id="myFileLabel" htmlFor="myFileInput">
