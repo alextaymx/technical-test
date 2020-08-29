@@ -11,22 +11,14 @@ const UploadFile = () => {
     const content = fileReader.result;
     // console.log("read successful! ", content);
     let usersObject = {}; //to count their chat words
-    let wordCount = content
-      .split(/<[^\s>]*>/g)
-      .slice(1)
-      .map((line) => {
-        return line.trim() !== "" && line.match(/\b(\w\w*)\b/g).length;
-      });
-    let username = content
-      .split(/[\s|\n]/g)
-      .filter((word) => word.match(/<[^\s>]*>/g))
-      .map((name) => {
-        return name.substr(name.indexOf("<") + 1, name.indexOf(">") - 1);
-      });
-    // console.log("username", username, "wordCount", wordCount);
-    username.forEach((user, index) => {
-      usersObject[user] = (usersObject[user] || 0) + wordCount[index];
+    let currentUser = "undefine user";
+    content.split(/\s+/g).forEach((word) => {
+      word.match(/<\S+>/g)
+        ? (currentUser = word.slice(1, -1))
+        : (usersObject[currentUser] =
+            (usersObject[currentUser] || 0) + (word !== "" && 1));
     });
+
     let sortable = [];
     for (var user in usersObject) {
       sortable.push({
@@ -38,8 +30,9 @@ const UploadFile = () => {
     sortable.sort((a, b) => {
       return b.count - a.count;
     });
+    console.log(sortable, "sortable result");
     setSorted(sortable);
-    console.log(sorted, "latest result");
+    console.log(sorted, "transferred! sorted array is empty now");
   };
 
   const handleFileChosen = async (file, e = null) => {
