@@ -16,11 +16,18 @@ button {
   transition: 0.3s;
 }
 button:hover {
-  border-color: #aaa;
-  background-color: #ddd;
+  border-color: orange;
+  color: orange;
+  /* background-color: #ddd; */
+  /* border: 3px solid orange; */
+  box-shadow: 0px 0px 25px -5px orange;
 }
 button:disabled {
   cursor: not-allowed;
+  color: #aaa;
+  border-color: #aaa;
+  background-color: #ddd;
+  box-shadow: none;
 }
 h5 {
   font-weight: bold;

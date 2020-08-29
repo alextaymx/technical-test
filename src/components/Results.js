@@ -10,11 +10,10 @@ const Results = () => {
       <h5>Results:</h5>
       <ul className="card">
         {results ? (
-          results.map((result) => {
+          results.map((result, index) => {
             return (
               <li key={result.id}>
-                {results.indexOf(result) + 1}. {result.user} - {result.count}{" "}
-                words
+                {index + 1}. {result.user} - {result.count} words
               </li>
             );
           })
